@@ -2,16 +2,18 @@ package client
 
 import (
 	"flag"
-	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	log "github.com/sirupsen/logrus"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+
 	// utilities for kubernetes integration
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
@@ -39,7 +41,7 @@ func InitClient() *kubernetes.Clientset {
 	}
 
 	// creating a client from env didn't work try auto discover
-	if home := homeDir(); home != "" {
+	if home, err := os.UserHomeDir(); err != nil {
 		kubeconfigbase = filepath.Join(home, ".kube", "config")
 	}
 
@@ -121,12 +123,4 @@ func getClientSetFromConfig(config *restclient.Config) (*kubernetes.Clientset, e
 		return nil, err
 	}
 	return clientset, nil
-}
-
-func homeDir() string {
-	if h := os.Getenv("HOME"); h != "" {
-		return h
-	}
-	// windows case
-	return os.Getenv("USERPROFILE")
 }
