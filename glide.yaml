@@ -1,6 +1,0 @@
-package: github/emirozer/kubectl-doctor
-import:
-- package: k8s.io/client-go
-  version: v0.25.0
-  subpackages:
-  - rest
