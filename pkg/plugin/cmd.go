@@ -7,7 +7,6 @@ import (
 
 	"github.com/emirozer/kubectl-doctor/pkg/triage"
 	"github.com/jedib0t/go-pretty/v6/table"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
@@ -27,13 +26,6 @@ const (
         * kubernetes nodes cpu usage or memory usage too high. or too low to report scaledown possiblity
 `
 )
-
-func init() {
-	log.SetFormatter(&log.TextFormatter{})
-	log.SetOutput(os.Stdout)
-	// Only log the info severity or above.
-	log.SetLevel(log.InfoLevel)
-}
 
 // DoctorOptions specify what the doctor is going to do
 type DoctorOptions struct {
@@ -117,7 +109,7 @@ func (o *DoctorOptions) Run(args []string) error {
 	for _, t := range triage.List {
 		anomalies, err := t.Triage(context.TODO(), cl)
 		if err != nil {
-			log.Error(fmt.Errorf("%s: %w", t.Id(), err))
+			return fmt.Errorf("%s: %w", t.Id(), err)
 		} else {
 			report[t] = anomalies
 			// if len(anomalies) > 0 {

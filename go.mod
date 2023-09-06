@@ -4,7 +4,6 @@ go 1.19
 
 require (
 	github.com/jedib0t/go-pretty/v6 v6.4.7
-	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
 	k8s.io/api v0.28.1
