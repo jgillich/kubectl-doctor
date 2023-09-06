@@ -2,6 +2,16 @@
 
 Find anomalies in your Kubernetes cluster.
 
+```
+$ kubectl doctor triage
+ TYPE                       SEVERITY  NAMESPACE    NAME                                       REASON                                                                                                                                                     
+ PersistentVolumeAvailable      Info               pv-available                                                                                                                                                                                          
+ DeploymentNotAvailable        Error  default      deployment-exit                            MinimumReplicasUnavailable                                                                                                                                 
+ DeploymentNotAvailable        Error  default      deployment-invalid-image                   MinimumReplicasUnavailable                                                                                                                                 
+ PodNotReady                   Error  default      deployment-exit-9bb67b49b-mvbb5            CrashLoopBackOff(nginx): back-off 5m0s restarting failed container=nginx pod=deployment-exit-9bb67b49b-mvbb5_default(89a7b5d9-d798-4624-a5a2-b5876a32b564) 
+ PodNotReady                   Error  default      deployment-invalid-image-76dd98b76d-d2g82  ImagePullBackOff(nginx): Back-off pulling image "nginx:00000"                                                                                              
+ PodWithoutOwner             Warning  kube-system  storage-provisioner
+ ```
 
 # License
 
