@@ -2,6 +2,7 @@ package triage
 
 import (
 	"context"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -52,7 +53,26 @@ func (*PodNotReady) Triage(ctx context.Context, cl client.Client) ([]Anomaly, er
 	for _, pod := range list.Items {
 		for _, cond := range pod.Status.Conditions {
 			if cond.Type == corev1.PodReady && cond.Status != "True" && cond.Reason != "PodCompleted" {
-				anomalies = append(anomalies, Anomaly{NamespacedName: nn(&pod), Reason: cond.Reason})
+				reason := cond.Reason
+				if cond.Reason == "ContainersNotReady" {
+					reason = ""
+					for _, s := range pod.Status.ContainerStatuses {
+						if s.State.Waiting != nil {
+							reason += fmt.Sprintf("%s(%s)", s.State.Waiting.Reason, s.Name)
+							if len(s.State.Waiting.Message) > 0 {
+								reason += fmt.Sprintf(": %s", s.State.Waiting.Message)
+							}
+							break
+						} else if s.State.Terminated != nil {
+							reason += fmt.Sprintf("%s(%s)", s.State.Terminated.Reason, s.Name)
+							if len(s.State.Terminated.Message) > 0 {
+								reason += fmt.Sprintf(": %s", s.State.Terminated.Message)
+							}
+							break
+						}
+					}
+				}
+				anomalies = append(anomalies, Anomaly{NamespacedName: nn(&pod), Reason: reason})
 			}
 		}
 	}
