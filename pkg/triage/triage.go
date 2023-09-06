@@ -10,10 +10,10 @@ import (
 type Severity int64
 
 const (
-	InfoSeverity Severity = iota
-	WarningSeverity
-	ErrorSeverity
-	FatalSeverity
+	Info Severity = iota
+	Warning
+	Error
+	Fatal
 )
 
 var List = []Triage{
@@ -34,8 +34,8 @@ type Triage interface {
 }
 
 type Anomaly struct {
-	Name   types.NamespacedName
-	Reason string
+	NamespacedName types.NamespacedName
+	Reason         string
 }
 
 func nn(obj client.Object) types.NamespacedName {

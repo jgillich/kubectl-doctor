@@ -18,7 +18,7 @@ func (*PersistentVolumeAvailable) Description() string {
 }
 
 func (*PersistentVolumeAvailable) Severity() Severity {
-	return InfoSeverity
+	return Info
 }
 
 func (*PersistentVolumeAvailable) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
@@ -30,7 +30,7 @@ func (*PersistentVolumeAvailable) Triage(ctx context.Context, cl client.Client) 
 	var anomalies []Anomaly
 	for _, pv := range list.Items {
 		if pv.Status.Phase == "Available" {
-			anomalies = append(anomalies, Anomaly{Name: nn(&pv)})
+			anomalies = append(anomalies, Anomaly{NamespacedName: nn(&pv)})
 		}
 	}
 	return anomalies, nil

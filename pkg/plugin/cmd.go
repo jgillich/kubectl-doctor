@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/emirozer/kubectl-doctor/pkg/triage"
+	"github.com/jedib0t/go-pretty/v6/table"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
@@ -110,19 +111,35 @@ func (o *DoctorOptions) Run(args []string) error {
 	if err != nil {
 		return err
 	}
+
+	var report = map[triage.Triage][]triage.Anomaly{}
+
 	for _, t := range triage.List {
 		anomalies, err := t.Triage(context.TODO(), cl)
 		if err != nil {
 			log.Error(fmt.Errorf("%s: %w", t.Id(), err))
 		} else {
-			if len(anomalies) > 0 {
-				fmt.Printf("%s: ", t.Id())
-				for _, a := range anomalies {
-					fmt.Printf("%s ", a.Name)
-				}
-				fmt.Println()
-			}
+			report[t] = anomalies
+			// if len(anomalies) > 0 {
+			// 	fmt.Printf("%s: ", t.Id())
+			// 	for _, a := range anomalies {
+			// 		fmt.Printf("%s ", a.NamespacedName)
+			// 	}
+			// 	fmt.Println()
+			// }
 		}
 	}
+
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.SetStyle(table.Style{Format: table.FormatOptionsDefault, Box: table.BoxStyle{PaddingLeft: " ", PaddingRight: " "}})
+	t.AppendHeader(table.Row{"Type", "Severity", "Namespace", "Name", "Reason"})
+	for triage, anomalies := range report {
+		for _, anomaly := range anomalies {
+			t.AppendRow(table.Row{triage.Id(), triage.Severity(), anomaly.NamespacedName.Namespace, anomaly.NamespacedName.Name, anomaly.Reason})
+		}
+	}
+	t.Render()
+
 	return nil
 }

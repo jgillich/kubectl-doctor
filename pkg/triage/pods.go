@@ -14,7 +14,7 @@ func (*PodWithoutOwner) Id() string {
 }
 
 func (*PodWithoutOwner) Severity() Severity {
-	return WarningSeverity
+	return Warning
 }
 
 func (*PodWithoutOwner) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
@@ -26,7 +26,7 @@ func (*PodWithoutOwner) Triage(ctx context.Context, cl client.Client) ([]Anomaly
 	var anomalies []Anomaly
 	for _, pod := range list.Items {
 		if len(pod.GetOwnerReferences()) == 0 {
-			anomalies = append(anomalies, Anomaly{Name: nn(&pod)})
+			anomalies = append(anomalies, Anomaly{NamespacedName: nn(&pod)})
 		}
 	}
 	return anomalies, nil
@@ -39,7 +39,7 @@ func (*PodNotReady) Id() string {
 }
 
 func (*PodNotReady) Severity() Severity {
-	return ErrorSeverity
+	return Error
 }
 
 func (*PodNotReady) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
@@ -52,7 +52,7 @@ func (*PodNotReady) Triage(ctx context.Context, cl client.Client) ([]Anomaly, er
 	for _, pod := range list.Items {
 		for _, cond := range pod.Status.Conditions {
 			if cond.Type == corev1.PodReady && cond.Status != "True" && cond.Reason != "PodCompleted" {
-				anomalies = append(anomalies, Anomaly{Name: nn(&pod)})
+				anomalies = append(anomalies, Anomaly{NamespacedName: nn(&pod), Reason: cond.Reason})
 			}
 		}
 	}

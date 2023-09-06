@@ -14,7 +14,7 @@ func (*ComponentUnhealthy) Id() string {
 }
 
 func (*ComponentUnhealthy) Severity() Severity {
-	return FatalSeverity
+	return Fatal
 }
 
 func (*ComponentUnhealthy) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
@@ -25,9 +25,9 @@ func (*ComponentUnhealthy) Triage(ctx context.Context, cl client.Client) ([]Anom
 
 	var anomalies []Anomaly
 	for _, componentStatus := range list.Items {
-		for _, y := range componentStatus.Conditions {
-			if y.Status != "True" {
-				anomalies = append(anomalies, Anomaly{Name: nn(&componentStatus)})
+		for _, cond := range componentStatus.Conditions {
+			if cond.Status != "True" {
+				anomalies = append(anomalies, Anomaly{NamespacedName: nn(&componentStatus)})
 			}
 		}
 	}

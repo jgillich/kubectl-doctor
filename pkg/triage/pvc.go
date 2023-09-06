@@ -14,7 +14,7 @@ func (*PersistentVolumeClaimLost) Id() string {
 }
 
 func (*PersistentVolumeClaimLost) Severity() Severity {
-	return ErrorSeverity
+	return Error
 }
 
 // TriagePVC gets a coreclient and checks if there are any pvcs that are in lost state
@@ -27,7 +27,7 @@ func (*PersistentVolumeClaimLost) Triage(ctx context.Context, cl client.Client) 
 	var anomalies []Anomaly
 	for _, pvc := range list.Items {
 		if pvc.Status.Phase == "Lost" {
-			anomalies = append(anomalies, Anomaly{Name: nn(&pvc)})
+			anomalies = append(anomalies, Anomaly{NamespacedName: nn(&pvc)})
 		}
 	}
 

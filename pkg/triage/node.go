@@ -18,7 +18,7 @@ func (*NodeNotReady) Id() string {
 }
 
 func (*NodeNotReady) Severity() Severity {
-	return ErrorSeverity
+	return Error
 }
 
 func (*NodeNotReady) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
@@ -31,7 +31,7 @@ func (*NodeNotReady) Triage(ctx context.Context, cl client.Client) ([]Anomaly, e
 	for _, node := range list.Items {
 		for _, cond := range node.Status.Conditions {
 			if cond.Type == corev1.NodeReady && cond.Status != "True" {
-				anomalies = append(anomalies, Anomaly{Name: nn(&node)})
+				anomalies = append(anomalies, Anomaly{NamespacedName: nn(&node), Reason: cond.Reason})
 			}
 		}
 	}

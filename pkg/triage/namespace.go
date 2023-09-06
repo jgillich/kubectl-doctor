@@ -15,7 +15,7 @@ func (*NamespaceTerminating) Id() string {
 }
 
 func (*NamespaceTerminating) Severity() Severity {
-	return ErrorSeverity
+	return Error
 }
 
 func (*NamespaceTerminating) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
@@ -27,7 +27,7 @@ func (*NamespaceTerminating) Triage(ctx context.Context, cl client.Client) ([]An
 	var anomalies []Anomaly
 	for _, namespace := range list.Items {
 		if namespace.DeletionTimestamp != nil {
-			anomalies = append(anomalies, Anomaly{Name: nn(&namespace)})
+			anomalies = append(anomalies, Anomaly{NamespacedName: nn(&namespace)})
 		}
 	}
 	return anomalies, nil

@@ -14,7 +14,7 @@ func (*DeploymentNotAvailable) Id() string {
 }
 
 func (*DeploymentNotAvailable) Severity() Severity {
-	return ErrorSeverity
+	return Error
 }
 
 func (*DeploymentNotAvailable) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
@@ -27,7 +27,7 @@ func (*DeploymentNotAvailable) Triage(ctx context.Context, cl client.Client) ([]
 	for _, deployment := range list.Items {
 		for _, cond := range deployment.Status.Conditions {
 			if cond.Type == appsv1.DeploymentAvailable && cond.Status != "True" {
-				anomalies = append(anomalies, Anomaly{Name: nn(&deployment)})
+				anomalies = append(anomalies, Anomaly{NamespacedName: nn(&deployment)})
 			}
 		}
 	}
@@ -41,7 +41,7 @@ func (*DeploymentIdle) Id() string {
 }
 
 func (*DeploymentIdle) Severity() Severity {
-	return WarningSeverity
+	return Warning
 }
 
 func (*DeploymentIdle) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
@@ -53,7 +53,7 @@ func (*DeploymentIdle) Triage(ctx context.Context, cl client.Client) ([]Anomaly,
 	var anomalies []Anomaly
 	for _, deployment := range list.Items {
 		if deployment.Status.Replicas == 0 && deployment.Status.AvailableReplicas == 0 {
-			anomalies = append(anomalies, Anomaly{Name: nn(&deployment)})
+			anomalies = append(anomalies, Anomaly{NamespacedName: nn(&deployment)})
 		}
 	}
 	return anomalies, nil
