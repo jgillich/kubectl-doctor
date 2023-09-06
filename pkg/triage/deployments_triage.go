@@ -2,10 +2,10 @@ package triage
 
 import (
 	"context"
-	"strings"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // OrphanedDeployments gets a kubernetes.Clientset and a specific namespace string
@@ -14,10 +14,8 @@ import (
 func OrphanedDeployments(ctx context.Context, kubeCli *kubernetes.Clientset, namespace string) (*Triage, error) {
 	listOfTriages := make([]string, 0)
 	deployments, err := kubeCli.AppsV1().Deployments(namespace).List(ctx, v1.ListOptions{})
-	if err != nil {
-		if !strings.Contains(err.Error(), KUBE_RESOURCE_NOT_FOUND) {
-			return nil, err
-		}
+	if client.IgnoreNotFound(err) != nil {
+		return nil, err
 	}
 	for _, i := range deployments.Items {
 		if i.Status.Replicas > 0 && i.Status.AvailableReplicas == 0 {
@@ -33,10 +31,8 @@ func OrphanedDeployments(ctx context.Context, kubeCli *kubernetes.Clientset, nam
 func LeftOverDeployments(ctx context.Context, kubeCli *kubernetes.Clientset, namespace string) (*Triage, error) {
 	listOfTriages := make([]string, 0)
 	deployments, err := kubeCli.AppsV1().Deployments(namespace).List(ctx, v1.ListOptions{})
-	if err != nil {
-		if !strings.Contains(err.Error(), KUBE_RESOURCE_NOT_FOUND) {
-			return nil, err
-		}
+	if client.IgnoreNotFound(err) != nil {
+		return nil, err
 	}
 
 	for _, i := range deployments.Items {

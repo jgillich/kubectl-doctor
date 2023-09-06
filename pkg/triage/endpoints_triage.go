@@ -5,15 +5,14 @@ import (
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	coreclient "k8s.io/client-go/kubernetes/typed/core/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // TriageEndpoints gets a coreclient for k8s and scans through all endpoints to see if they are leftover/unused
 func TriageEndpoints(ctx context.Context, coreClient coreclient.CoreV1Interface, namespace string) (*Triage, error) {
 	endpoints, err := coreClient.Endpoints(namespace).List(ctx, v1.ListOptions{})
-	if err != nil {
-		if err.Error() != KUBE_RESOURCE_NOT_FOUND {
-			return nil, err
-		}
+	if client.IgnoreNotFound(err) != nil {
+		return nil, err
 	}
 
 	listOfTriages := make([]string, 0)

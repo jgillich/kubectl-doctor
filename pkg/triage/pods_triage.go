@@ -2,10 +2,10 @@ package triage
 
 import (
 	"context"
-	"strings"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const podTargetReason = "Ready"
@@ -16,11 +16,10 @@ const podTargetReason = "Ready"
 func StandalonePods(ctx context.Context, kubeCli *kubernetes.Clientset, namespace string) (*Triage, error) {
 	listOfTriages := make([]string, 0)
 	pods, err := kubeCli.CoreV1().Pods(namespace).List(ctx, v1.ListOptions{})
-	if err != nil {
-		if !strings.Contains(err.Error(), KUBE_RESOURCE_NOT_FOUND) {
-			return nil, err
-		}
+	if client.IgnoreNotFound(err) != nil {
+		return nil, err
 	}
+
 	for _, i := range pods.Items {
 		if len(i.GetOwnerReferences()) == 0 {
 			listOfTriages = append(listOfTriages, i.GetName())
@@ -35,10 +34,8 @@ func StandalonePods(ctx context.Context, kubeCli *kubernetes.Clientset, namespac
 func UnreadyPods(ctx context.Context, kubeCli *kubernetes.Clientset, namespace string) (*Triage, error) {
 	listOfTriages := make([]string, 0)
 	pods, err := kubeCli.CoreV1().Pods(namespace).List(ctx, v1.ListOptions{})
-	if err != nil {
-		if !strings.Contains(err.Error(), KUBE_RESOURCE_NOT_FOUND) {
-			return nil, err
-		}
+	if client.IgnoreNotFound(err) != nil {
+		return nil, err
 	}
 
 	for _, i := range pods.Items {

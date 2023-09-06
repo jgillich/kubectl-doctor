@@ -5,6 +5,7 @@ import (
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // OrphanedReplicaSet gets a kubernetes.Clientset and a specific namespace string
@@ -13,10 +14,8 @@ import (
 func OrphanedReplicaSet(ctx context.Context, kubeCli *kubernetes.Clientset, namespace string) (*Triage, error) {
 	listOfTriages := make([]string, 0)
 	rs, err := kubeCli.AppsV1().ReplicaSets(namespace).List(ctx, v1.ListOptions{})
-	if err != nil {
-		if err.Error() != KUBE_RESOURCE_NOT_FOUND {
-			return nil, err
-		}
+	if client.IgnoreNotFound(err) != nil {
+		return nil, err
 	}
 
 	for _, i := range rs.Items {
@@ -33,10 +32,8 @@ func OrphanedReplicaSet(ctx context.Context, kubeCli *kubernetes.Clientset, name
 func LeftOverReplicaSet(ctx context.Context, kubeCli *kubernetes.Clientset, namespace string) (*Triage, error) {
 	listOfTriages := make([]string, 0)
 	rs, err := kubeCli.AppsV1().ReplicaSets(namespace).List(ctx, v1.ListOptions{})
-	if err != nil {
-		if err.Error() != KUBE_RESOURCE_NOT_FOUND {
-			return nil, err
-		}
+	if client.IgnoreNotFound(err) != nil {
+		return nil, err
 	}
 
 	for _, i := range rs.Items {

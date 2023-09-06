@@ -2,10 +2,10 @@ package triage
 
 import (
 	"context"
-	"strings"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // StandalonePods gets a kubernetes.Clientset and a specific namespace string
@@ -14,11 +14,10 @@ import (
 func TerminatingNamespaces(ctx context.Context, kubeCli *kubernetes.Clientset) (*Triage, error) {
 	listOfTriages := make([]string, 0)
 	namespaces, err := kubeCli.CoreV1().Namespaces().List(ctx, v1.ListOptions{})
-	if err != nil {
-		if !strings.Contains(err.Error(), KUBE_RESOURCE_NOT_FOUND) {
-			return nil, err
-		}
+	if client.IgnoreNotFound(err) != nil {
+		return nil, err
 	}
+
 	for _, i := range namespaces.Items {
 		if i.Status.Phase == "Terminating" {
 			listOfTriages = append(listOfTriages, i.GetName())
