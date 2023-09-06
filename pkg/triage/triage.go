@@ -1,18 +1,43 @@
 package triage
 
-// used to determine if the err from kube api is only because that type of resource is not in the targeted namespace
-const KUBE_RESOURCE_NOT_FOUND string = "the server could not find the requested resource"
+import (
+	"context"
 
-type Triage struct {
-	ResourceType string   `yaml:"Resource"`
-	AnomalyType  string   `yaml:"AnomalyType"`
-	Anomalies    []string `yaml:"Anomalies"`
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+)
+
+type Severity int64
+
+const (
+	InfoSeverity Severity = iota
+	WarningSeverity
+	ErrorSeverity
+	FatalSeverity
+)
+
+var List = []Triage{
+	&ComponentUnhealthy{},
+	&DeploymentIdle{},
+	&DeploymentNotAvailable{},
+	&NamespaceTerminating{},
+	&PodNotReady{},
+	&PodWithoutOwner{},
+	&PersistentVolumeAvailable{},
+	&PersistentVolumeClaimLost{},
 }
 
-func NewTriage(resourceType string, anomalyType string, anomalies []string) *Triage {
-	return &Triage{
-		ResourceType: resourceType,
-		AnomalyType:  anomalyType,
-		Anomalies:    anomalies,
-	}
+type Triage interface {
+	Id() string
+	Severity() Severity
+	Triage(context.Context, client.Client) ([]Anomaly, error)
+}
+
+type Anomaly struct {
+	Name   types.NamespacedName
+	Reason string
+}
+
+func nn(obj client.Object) types.NamespacedName {
+	return types.NamespacedName{Name: obj.GetName(), Namespace: obj.GetNamespace()}
 }
