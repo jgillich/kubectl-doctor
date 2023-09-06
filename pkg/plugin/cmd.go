@@ -2,11 +2,10 @@ package plugin
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 
-	"github.com/coreos/go-semver/semver"
-	"github.com/emirozer/kubectl-doctor/pkg/client"
 	"github.com/emirozer/kubectl-doctor/pkg/triage"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -17,6 +16,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	coreclient "k8s.io/client-go/kubernetes/typed/core/v1"
 	restclient "k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 )
 
@@ -36,8 +36,6 @@ const (
 	usageError = "expects no flags .. 'doctor' for doctor command"
 )
 
-const K8S_CLIENT_VERSION = "11.0.0"
-
 var (
 	clientset *kubernetes.Clientset
 )
@@ -47,7 +45,40 @@ func init() {
 	log.SetOutput(os.Stdout)
 	// Only log the info severity or above.
 	log.SetLevel(log.InfoLevel)
-	clientset = client.InitClient()
+
+	var kubeconfig *string
+	chain := clientcmd.NewDefaultClientConfigLoadingRules().Precedence
+	if len(chain) > 0 {
+		kubeconfig = &chain[0]
+	}
+	kubeconfig = flag.String(
+		"kubeconfig",
+		*kubeconfig,
+		"(optional) absolute path to the kubeconfig file",
+	)
+	var kubecontext = flag.String(
+		"context",
+		"",
+		"(optional) name of kube context",
+	)
+
+	flag.Parse()
+
+	log.Info(*kubeconfig)
+
+	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		&clientcmd.ClientConfigLoadingRules{ExplicitPath: *kubeconfig},
+		&clientcmd.ConfigOverrides{
+			CurrentContext: *kubecontext,
+		}).ClientConfig()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	clientset, err = kubernetes.NewForConfig(config)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }
 
 // DoctorOptions specify what the doctor is going to do
@@ -145,20 +176,6 @@ func (o *DoctorOptions) Validate() error {
 		return errors.New("namespace must be specified/retrieved properly!")
 	}
 
-	// compat check
-	serverVersion, err := o.KubeCli.ServerVersion()
-	if err != nil {
-		return err
-	}
-	// vx.x.x to x.x.x
-	serverVersionStr := serverVersion.String()[1:]
-
-	serverSemVer := semver.New(serverVersionStr)
-	if serverSemVer.Major != 1 || serverSemVer.Minor != 14 {
-		log.Warn("doctor's client-go version: " + K8S_CLIENT_VERSION + " is not fully compatible with your k8s server version: " + serverVersionStr)
-		log.Warn("https://github.com/kubernetes/client-go#compatibility-matrix")
-		log.Warn("doctor run will be based on best-effort delivery")
-	}
 	return nil
 }
 
