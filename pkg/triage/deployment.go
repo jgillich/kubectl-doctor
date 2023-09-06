@@ -26,7 +26,10 @@ func (*DeploymentNotAvailable) Triage(ctx context.Context, cl client.Client) (an
 	for _, deployment := range list.Items {
 		for _, cond := range deployment.Status.Conditions {
 			if cond.Type == appsv1.DeploymentAvailable && cond.Status != "True" {
-				anomalies = append(anomalies, Anomaly{NamespacedName: nn(&deployment)})
+				anomalies = append(anomalies, Anomaly{
+					NamespacedName: nn(&deployment),
+					Reason:         cond.Reason,
+				})
 			}
 		}
 	}
