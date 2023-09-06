@@ -21,13 +21,12 @@ func (*NodeNotReady) Severity() Severity {
 	return Error
 }
 
-func (*NodeNotReady) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
+func (*NodeNotReady) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {
 	var list corev1.NodeList
 	if err := cl.List(ctx, &list); client.IgnoreNotFound(err) != nil {
 		return nil, err
 	}
 
-	var anomalies []Anomaly
 	for _, node := range list.Items {
 		for _, cond := range node.Status.Conditions {
 			if cond.Type == corev1.NodeReady && cond.Status != "True" {
@@ -35,5 +34,5 @@ func (*NodeNotReady) Triage(ctx context.Context, cl client.Client) ([]Anomaly, e
 			}
 		}
 	}
-	return anomalies, nil
+	return
 }

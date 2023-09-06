@@ -21,17 +21,16 @@ func (*PersistentVolumeAvailable) Severity() Severity {
 	return Info
 }
 
-func (*PersistentVolumeAvailable) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
+func (*PersistentVolumeAvailable) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {
 	var list corev1.PersistentVolumeList
 	if err := cl.List(ctx, &list); client.IgnoreNotFound(err) != nil {
 		return nil, err
 	}
 
-	var anomalies []Anomaly
 	for _, pv := range list.Items {
 		if pv.Status.Phase == "Available" {
 			anomalies = append(anomalies, Anomaly{NamespacedName: nn(&pv)})
 		}
 	}
-	return anomalies, nil
+	return
 }

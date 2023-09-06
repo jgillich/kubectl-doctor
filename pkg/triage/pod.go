@@ -18,19 +18,18 @@ func (*PodWithoutOwner) Severity() Severity {
 	return Warning
 }
 
-func (*PodWithoutOwner) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
+func (*PodWithoutOwner) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {
 	var list corev1.PodList
 	if err := cl.List(ctx, &list); client.IgnoreNotFound(err) != nil {
 		return nil, err
 	}
 
-	var anomalies []Anomaly
 	for _, pod := range list.Items {
 		if len(pod.GetOwnerReferences()) == 0 {
 			anomalies = append(anomalies, Anomaly{NamespacedName: nn(&pod)})
 		}
 	}
-	return anomalies, nil
+	return
 }
 
 type PodNotReady struct{}
@@ -43,13 +42,12 @@ func (*PodNotReady) Severity() Severity {
 	return Error
 }
 
-func (*PodNotReady) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
+func (*PodNotReady) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {
 	var list corev1.PodList
 	if err := cl.List(ctx, &list); client.IgnoreNotFound(err) != nil {
 		return nil, err
 	}
 
-	var anomalies []Anomaly
 	for _, pod := range list.Items {
 		for _, cond := range pod.Status.Conditions {
 			if cond.Type == corev1.PodReady && cond.Status != "True" && cond.Reason != "PodCompleted" {
@@ -62,6 +60,9 @@ func (*PodNotReady) Triage(ctx context.Context, cl client.Client) ([]Anomaly, er
 							if len(s.State.Waiting.Message) > 0 {
 								reason += fmt.Sprintf(": %s", s.State.Waiting.Message)
 							}
+							// if s.State.Waiting.Reason == "CrashLoopBackOff" {
+							// 	reason +=
+							// }
 							break
 						} else if s.State.Terminated != nil {
 							reason += fmt.Sprintf("%s(%s)", s.State.Terminated.Reason, s.Name)
@@ -76,5 +77,5 @@ func (*PodNotReady) Triage(ctx context.Context, cl client.Client) ([]Anomaly, er
 			}
 		}
 	}
-	return anomalies, nil
+	return
 }

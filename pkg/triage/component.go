@@ -17,13 +17,12 @@ func (*ComponentUnhealthy) Severity() Severity {
 	return Fatal
 }
 
-func (*ComponentUnhealthy) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
+func (*ComponentUnhealthy) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {
 	var list corev1.ComponentStatusList
 	if err := cl.List(ctx, &list); client.IgnoreNotFound(err) != nil {
 		return nil, err
 	}
 
-	var anomalies []Anomaly
 	for _, componentStatus := range list.Items {
 		for _, cond := range componentStatus.Conditions {
 			if cond.Status != "True" {
@@ -31,6 +30,5 @@ func (*ComponentUnhealthy) Triage(ctx context.Context, cl client.Client) ([]Anom
 			}
 		}
 	}
-
-	return anomalies, nil
+	return
 }

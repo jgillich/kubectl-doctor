@@ -17,13 +17,12 @@ func (*DeploymentNotAvailable) Severity() Severity {
 	return Error
 }
 
-func (*DeploymentNotAvailable) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
+func (*DeploymentNotAvailable) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {
 	var list appsv1.DeploymentList
-	if err := cl.List(ctx, &list); client.IgnoreNotFound(err) != nil {
-		return nil, err
+	if err = cl.List(ctx, &list); client.IgnoreNotFound(err) != nil {
+		return
 	}
 
-	var anomalies []Anomaly
 	for _, deployment := range list.Items {
 		for _, cond := range deployment.Status.Conditions {
 			if cond.Type == appsv1.DeploymentAvailable && cond.Status != "True" {
@@ -31,7 +30,7 @@ func (*DeploymentNotAvailable) Triage(ctx context.Context, cl client.Client) ([]
 			}
 		}
 	}
-	return anomalies, nil
+	return
 }
 
 type DeploymentIdle struct{}
@@ -44,17 +43,16 @@ func (*DeploymentIdle) Severity() Severity {
 	return Warning
 }
 
-func (*DeploymentIdle) Triage(ctx context.Context, cl client.Client) ([]Anomaly, error) {
+func (*DeploymentIdle) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {
 	var list appsv1.DeploymentList
 	if err := cl.List(ctx, &list); client.IgnoreNotFound(err) != nil {
 		return nil, err
 	}
 
-	var anomalies []Anomaly
 	for _, deployment := range list.Items {
 		if deployment.Status.Replicas == 0 && deployment.Status.AvailableReplicas == 0 {
 			anomalies = append(anomalies, Anomaly{NamespacedName: nn(&deployment)})
 		}
 	}
-	return anomalies, nil
+	return
 }
