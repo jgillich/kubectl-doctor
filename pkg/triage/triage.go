@@ -43,7 +43,6 @@ var List = []Triage{
 }
 
 type Triage interface {
-	Id() string
 	Severity() Severity
 	Triage(context.Context, client.Client) ([]Anomaly, error)
 }

@@ -13,10 +13,6 @@ func init() {
 
 type NodeNotReady struct{}
 
-func (*NodeNotReady) Id() string {
-	return "NodeNotReady"
-}
-
 func (*NodeNotReady) Severity() Severity {
 	return Error
 }

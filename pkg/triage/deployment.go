@@ -9,10 +9,6 @@ import (
 
 type DeploymentNotAvailable struct{}
 
-func (*DeploymentNotAvailable) Id() string {
-	return "DeploymentNotAvailable"
-}
-
 func (*DeploymentNotAvailable) Severity() Severity {
 	return Error
 }
@@ -37,10 +33,6 @@ func (*DeploymentNotAvailable) Triage(ctx context.Context, cl client.Client) (an
 }
 
 type DeploymentIdle struct{}
-
-func (*DeploymentIdle) Id() string {
-	return "DeploymentIdle"
-}
 
 func (*DeploymentIdle) Severity() Severity {
 	return Warning

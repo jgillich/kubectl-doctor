@@ -9,10 +9,6 @@ import (
 
 type PersistentVolumeClaimLost struct{}
 
-func (*PersistentVolumeClaimLost) Id() string {
-	return "PersistentVolumeClaimLost"
-}
-
 func (*PersistentVolumeClaimLost) Severity() Severity {
 	return Error
 }

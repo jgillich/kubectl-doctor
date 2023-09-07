@@ -10,10 +10,6 @@ import (
 
 type PodWithoutOwner struct{}
 
-func (*PodWithoutOwner) Id() string {
-	return "PodWithoutOwner"
-}
-
 func (*PodWithoutOwner) Severity() Severity {
 	return Warning
 }
@@ -33,10 +29,6 @@ func (*PodWithoutOwner) Triage(ctx context.Context, cl client.Client) (anomalies
 }
 
 type PodNotReady struct{}
-
-func (*PodNotReady) Id() string {
-	return "PodNotReady"
-}
 
 func (*PodNotReady) Severity() Severity {
 	return Error

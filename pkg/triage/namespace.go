@@ -10,10 +10,6 @@ import (
 type NamespaceTerminating struct {
 }
 
-func (*NamespaceTerminating) Id() string {
-	return "NamespaceTerminating"
-}
-
 func (*NamespaceTerminating) Severity() Severity {
 	return Error
 }

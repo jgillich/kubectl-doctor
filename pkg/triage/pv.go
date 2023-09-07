@@ -9,10 +9,6 @@ import (
 
 type PersistentVolumeAvailable struct{}
 
-func (*PersistentVolumeAvailable) Id() string {
-	return "PersistentVolumeAvailable"
-}
-
 func (*PersistentVolumeAvailable) Description() string {
 	return "PersistentVolume is not bound to a PersistentVolumeClaim"
 }

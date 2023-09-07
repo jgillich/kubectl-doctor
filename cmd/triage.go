@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"reflect"
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jgillich/kubectl-doctor/pkg/triage"
@@ -34,7 +35,7 @@ var cmdTriage = &cobra.Command{
 		t.AppendHeader(table.Row{"Type", "Severity", "Namespace", "Name", "Reason"})
 		for triage, anomalies := range report {
 			for _, anomaly := range anomalies {
-				t.AppendRow(table.Row{triage.Id(), triage.Severity(), anomaly.NamespacedName.Namespace, anomaly.NamespacedName.Name, anomaly.Reason})
+				t.AppendRow(table.Row{reflect.TypeOf(triage).Elem().Name(), triage.Severity(), anomaly.NamespacedName.Namespace, anomaly.NamespacedName.Name, anomaly.Reason})
 			}
 		}
 		t.Render()

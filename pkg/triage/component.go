@@ -9,10 +9,6 @@ import (
 
 type ComponentUnhealthy struct{}
 
-func (*ComponentUnhealthy) Id() string {
-	return "ComponentUnhealthy"
-}
-
 func (*ComponentUnhealthy) Severity() Severity {
 	return Fatal
 }
