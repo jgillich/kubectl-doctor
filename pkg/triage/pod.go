@@ -14,6 +14,10 @@ func (*PodWithoutOwner) Severity() Severity {
 	return Warning
 }
 
+func (*PodWithoutOwner) Description() string {
+	return "Pod does not have any owner references and may be lost when evicted."
+}
+
 func (*PodWithoutOwner) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {
 	var list corev1.PodList
 	if err := cl.List(ctx, &list); client.IgnoreNotFound(err) != nil {
@@ -32,6 +36,10 @@ type PodNotReady struct{}
 
 func (*PodNotReady) Severity() Severity {
 	return Error
+}
+
+func (*PodNotReady) Description() string {
+	return "Pod is not ready."
 }
 
 func (*PodNotReady) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {

@@ -9,12 +9,12 @@ import (
 
 type PersistentVolumeAvailable struct{}
 
-func (*PersistentVolumeAvailable) Description() string {
-	return "PersistentVolume is not bound to a PersistentVolumeClaim"
-}
-
 func (*PersistentVolumeAvailable) Severity() Severity {
 	return Info
+}
+
+func (*PersistentVolumeAvailable) Description() string {
+	return "PersistentVolume is not bound to a PersistentVolumeClaim."
 }
 
 func (*PersistentVolumeAvailable) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {

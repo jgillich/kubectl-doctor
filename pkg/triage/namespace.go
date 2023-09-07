@@ -11,7 +11,11 @@ type NamespaceTerminating struct {
 }
 
 func (*NamespaceTerminating) Severity() Severity {
-	return Error
+	return Warning
+}
+
+func (*NamespaceTerminating) Description() string {
+	return "Namespace is awaiting termination."
 }
 
 func (*NamespaceTerminating) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {

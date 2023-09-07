@@ -13,6 +13,10 @@ func (*DeploymentNotAvailable) Severity() Severity {
 	return Error
 }
 
+func (*DeploymentNotAvailable) Description() string {
+	return "Deployment is unavailable."
+}
+
 func (*DeploymentNotAvailable) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {
 	var list appsv1.DeploymentList
 	if err = cl.List(ctx, &list); client.IgnoreNotFound(err) != nil {
@@ -36,6 +40,10 @@ type DeploymentIdle struct{}
 
 func (*DeploymentIdle) Severity() Severity {
 	return Warning
+}
+
+func (*DeploymentIdle) Description() string {
+	return "Deployment does not have any replicas."
 }
 
 func (*DeploymentIdle) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {

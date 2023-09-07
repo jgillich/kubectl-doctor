@@ -17,6 +17,10 @@ func (*NodeNotReady) Severity() Severity {
 	return Error
 }
 
+func (*NodeNotReady) Description() string {
+	return "Node is not ready."
+}
+
 func (*NodeNotReady) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {
 	var list corev1.NodeList
 	if err := cl.List(ctx, &list); client.IgnoreNotFound(err) != nil {

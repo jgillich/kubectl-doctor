@@ -13,6 +13,10 @@ func (*PersistentVolumeClaimLost) Severity() Severity {
 	return Error
 }
 
+func (*PersistentVolumeClaimLost) Description() string {
+	return "PersistentVolumeClaim volume does not exist any longer and data on it was lost."
+}
+
 func (*PersistentVolumeClaimLost) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {
 	var list corev1.PersistentVolumeList
 	if err := cl.List(ctx, &list); client.IgnoreNotFound(err) != nil {

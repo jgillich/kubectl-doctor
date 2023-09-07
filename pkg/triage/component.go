@@ -13,6 +13,10 @@ func (*ComponentUnhealthy) Severity() Severity {
 	return Fatal
 }
 
+func (*ComponentUnhealthy) Description() string {
+	return "Core component is unhealthy."
+}
+
 func (*ComponentUnhealthy) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {
 	var list corev1.ComponentStatusList
 	if err := cl.List(ctx, &list); client.IgnoreNotFound(err) != nil {
@@ -21,7 +25,7 @@ func (*ComponentUnhealthy) Triage(ctx context.Context, cl client.Client) (anomal
 
 	for _, componentStatus := range list.Items {
 		for _, cond := range componentStatus.Conditions {
-			if cond.Status != "True" {
+			if cond.Type == "Healthy" && cond.Status != "True" {
 				anomalies = append(anomalies, Anomaly{NamespacedName: nn(&componentStatus)})
 			}
 		}

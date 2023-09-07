@@ -2,6 +2,7 @@ package triage
 
 import (
 	"context"
+	"reflect"
 
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -44,6 +45,7 @@ var List = []Triage{
 
 type Triage interface {
 	Severity() Severity
+	Description() string
 	Triage(context.Context, client.Client) ([]Anomaly, error)
 }
 
@@ -54,4 +56,8 @@ type Anomaly struct {
 
 func nn(obj client.Object) types.NamespacedName {
 	return types.NamespacedName{Name: obj.GetName(), Namespace: obj.GetNamespace()}
+}
+
+func Id(t Triage) string {
+	return reflect.TypeOf(t).Elem().Name()
 }
