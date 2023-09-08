@@ -13,7 +13,14 @@ $ kubectl doctor triage
  PodWithoutOwner             Warning  kube-system  storage-provisioner
  ```
 
-# License
+
+## Installation
+
+```
+go install github.com/jgillich/kubectl-doctor/cmd/kubectl-doctor@latest
+```
+
+## License
 
 Copyright 2023 Jakob Gillich
 
