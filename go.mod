@@ -4,6 +4,8 @@ go 1.19
 
 require (
 	github.com/cloudnative-pg/cloudnative-pg v1.20.2
+	github.com/fluxcd/helm-controller/api v0.36.0
+	github.com/fluxcd/kustomize-controller/api v1.1.0
 	github.com/spf13/cobra v1.7.0
 	k8s.io/api v0.28.1
 	k8s.io/apiextensions-apiserver v0.28.0
@@ -20,6 +22,8 @@ require (
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
 	github.com/evanphx/json-patch v5.6.0+incompatible // indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
+	github.com/fluxcd/pkg/apis/kustomize v1.1.1 // indirect
+	github.com/fluxcd/pkg/apis/meta v1.1.2 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect

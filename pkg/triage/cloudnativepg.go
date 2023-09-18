@@ -19,7 +19,7 @@ func (*CloudnativePGClusterNotReady) Description() string {
 }
 
 func (*CloudnativePGClusterNotReady) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {
-	if ok, err := hasCRD(ctx, cl, cnpgv1.ClusterGVK); !ok {
+	if ok, err := resourceExists(ctx, cl, cnpgv1.ClusterGVK); !ok {
 		return nil, err
 	}
 
@@ -49,7 +49,7 @@ func (*CloudnativePGClusterContinuousArchivingFailing) Description() string {
 }
 
 func (*CloudnativePGClusterContinuousArchivingFailing) Triage(ctx context.Context, cl client.Client) (anomalies []Anomaly, err error) {
-	if ok, err := hasCRD(ctx, cl, cnpgv1.ClusterGVK); !ok {
+	if ok, err := resourceExists(ctx, cl, cnpgv1.ClusterGVK); !ok {
 		return nil, err
 	}
 

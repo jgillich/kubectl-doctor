@@ -40,6 +40,8 @@ var List = []Triage{
 	&ComponentUnhealthy{},
 	&DeploymentIdle{},
 	&DeploymentNotAvailable{},
+	&FluxHelmReleaseNotReady{},
+	&FluxKustomizationNotReady{},
 	&NamespaceTerminating{},
 	&PodNotReady{},
 	&PodWithoutOwner{},
@@ -66,7 +68,7 @@ func Id(t Triage) string {
 	return reflect.TypeOf(t).Elem().Name()
 }
 
-func hasCRD(ctx context.Context, c client.Client, gvk schema.GroupVersionResource) (bool, error) {
+func resourceExists(ctx context.Context, c client.Client, gvk schema.GroupVersionResource) (bool, error) {
 	var list apiextensionsv1.CustomResourceDefinitionList
 	if err := c.List(ctx, &list); err != nil {
 		return false, err

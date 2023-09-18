@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	cnpgv1 "github.com/cloudnative-pg/cloudnative-pg/api/v1"
+	helmv2beta1 "github.com/fluxcd/helm-controller/api/v2beta1"
+	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1"
 	"github.com/jgillich/kubectl-doctor/pkg/triage"
 	"github.com/spf13/cobra"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -23,6 +25,8 @@ var cmdTriage = &cobra.Command{
 
 		checkErr(apiextensionsv1.AddToScheme(scheme.Scheme))
 		checkErr(cnpgv1.AddToScheme(scheme.Scheme))
+		checkErr(helmv2beta1.AddToScheme(scheme.Scheme))
+		checkErr(kustomizev1.AddToScheme(scheme.Scheme))
 
 		cl, err := client.New(restConfig, client.Options{
 			Scheme: scheme.Scheme,
