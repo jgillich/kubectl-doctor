@@ -5,9 +5,12 @@ import (
 	"os"
 	"strings"
 
+	cnpgv1 "github.com/cloudnative-pg/cloudnative-pg/api/v1"
 	"github.com/jgillich/kubectl-doctor/pkg/triage"
 	"github.com/spf13/cobra"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/cli-runtime/pkg/printers"
+	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -18,7 +21,12 @@ var cmdTriage = &cobra.Command{
 		restConfig, err := flags.ToRawKubeConfigLoader().ClientConfig()
 		checkErr(err)
 
-		cl, err := client.New(restConfig, client.Options{})
+		checkErr(apiextensionsv1.AddToScheme(scheme.Scheme))
+		checkErr(cnpgv1.AddToScheme(scheme.Scheme))
+
+		cl, err := client.New(restConfig, client.Options{
+			Scheme: scheme.Scheme,
+		})
 		checkErr(err)
 
 		var report = map[triage.Triage][]triage.Anomaly{}
